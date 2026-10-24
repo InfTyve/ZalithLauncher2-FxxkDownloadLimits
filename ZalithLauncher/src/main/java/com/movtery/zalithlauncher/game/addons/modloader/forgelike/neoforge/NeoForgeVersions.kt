@@ -24,7 +24,6 @@ import com.movtery.zalithlauncher.game.addons.mirror.orderedByGameSourcePreferen
 import com.movtery.zalithlauncher.game.addons.mirror.runMirrorable
 import com.movtery.zalithlauncher.game.addons.modloader.forgelike.neoforge.models.BMCLAPIMaven
 import com.movtery.zalithlauncher.game.addons.modloader.forgelike.neoforge.models.NeoForgedMaven
-import com.movtery.zalithlauncher.utils.isChinaMainland
 import com.movtery.zalithlauncher.utils.logging.Logger
 import com.movtery.zalithlauncher.utils.network.httpGetJson
 import com.movtery.zalithlauncher.utils.network.withRetry
@@ -47,13 +46,10 @@ object NeoForgeVersions {
             return@withContext it.outputVersionList(gameVersion)
         }
 
-        if (isChinaMainland()) {
-            runMirrorable(
-                listOf(fetchListWithOfficial(), fetchListWithBMCLAPI()).orderedByGameSourcePreference()
-            )
-        } else {
-            fetchOfficialVersions()
-        }?.also {
+        //镜像始终作为候选：大陆网络下优先，其他网络下官方优先、镜像兜底
+        runMirrorable(
+            listOf(fetchListWithOfficial(), fetchListWithBMCLAPI()).orderedByGameSourcePreference()
+        )?.also {
             cacheResult = it
         }?.outputVersionList(gameVersion)
     }

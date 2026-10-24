@@ -18,6 +18,7 @@
 
 package com.movtery.zalithlauncher.utils.network
 
+import com.movtery.zalithlauncher.utils.isChinaMainland
 import com.movtery.zalithlauncher.utils.logging.Logger
 import okhttp3.Dns
 import okhttp3.OkHttpClient
@@ -41,6 +42,9 @@ import java.util.concurrent.TimeUnit
  */
 object ResilientDns : Dns {
     private const val TAG = "ResilientDns"
+
+    /** 国内可直连的 DoH 节点（阿里 DNS） */
+    private const val ALIDNS_HOST = "223.5.5.5"
 
     /** DoH 解析结果的缓存时长 */
     private const val CACHE_TTL_MILLIS = 10 * 60 * 1000L
@@ -66,6 +70,18 @@ object ResilientDns : Dns {
         "https://223.5.5.5/resolve?name=%s&type=A" //AliDNS
     )
 
+    /**
+     * 中国大陆网络下优先使用国内 DoH：
+     * Cloudflare / Google 的 DoH 在内地通常不可达，要各等满 5 秒连接超时才轮到 AliDNS，
+     * 系统 DNS 一旦被污染，解析就会被拖到超时甚至直接判定失败。
+     */
+    private fun orderedProviders(): List<String> =
+        if (isChinaMainland()) {
+            dohProviders.sortedByDescending { if (it.contains(ALIDNS_HOST)) 1 else 0 }
+        } else {
+            dohProviders
+        }
+
     override fun lookup(hostname: String): List<InetAddress> {
         try {
             return Dns.SYSTEM.lookup(hostname)
@@ -82,7 +98,7 @@ object ResilientDns : Dns {
         }
 
         var lastError: Exception? = null
-        for (template in dohProviders) {
+        for (template in orderedProviders()) {
             try {
                 val addresses = dohLookup(template.format(hostname))
                 if (addresses.isNotEmpty()) {

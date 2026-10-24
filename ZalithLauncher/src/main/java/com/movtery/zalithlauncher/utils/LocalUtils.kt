@@ -392,6 +392,12 @@ private fun formatWithUnit(value: Double, unit: String): String {
     return "$displayValue$unit"
 }
 
+/**
+ * 判断当前设备是否可能处于中国大陆网络环境
+ *
+ * 该判定只用于决定「镜像源是否优先」，不再是镜像可用性的前置开关：
+ * 判定为 false 时镜像仍会作为候选源注入，由下载引擎在官方源失败后自动换源。
+ */
 fun isChinaMainland(): Boolean {
     val timeZone = TimeZone.getDefault()
 
@@ -399,17 +405,21 @@ fun isChinaMainland(): Boolean {
         timeZone.id in listOf(
             "Asia/Shanghai",
             "Asia/Chongqing",//历史遗留
-            "Asia/Urumqi"
+            "Asia/Urumqi",
+            "Asia/Harbin",//历史遗留
+            "PRC",//历史遗留
+            "Asia/Hong_Kong",
+            "Asia/Macau",
+            "Asia/Taipei"
         )
     ) return true
 
     val offsetMillis = timeZone.getOffset(System.currentTimeMillis())
-    val isUtcPlus8 = offsetMillis == 8 * 60 * 60 * 1000
 
-    if (!isUtcPlus8) return false
-
-    //应用内支持修改语言，不能再以语言来进行判断
-    return /*Locale.getDefault().country.equals("CN", ignoreCase = true)*/false
+    //UTC+8 时区一律视为可能处于中国大陆网络环境
+    //原实现把这一档写死为 false，导致除上述时区 ID 以外的设备（含港澳台以及被 ROM 改过时区名的设备）
+    //永远拿不到 BMCLAPI / MCIM 镜像，官方源直连失败后只能反复重试
+    return offsetMillis == 8 * 60 * 60 * 1000
 }
 
 /**

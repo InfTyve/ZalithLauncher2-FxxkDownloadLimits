@@ -25,7 +25,6 @@ import com.movtery.zalithlauncher.game.addons.mirror.runMirrorable
 import com.movtery.zalithlauncher.game.addons.modloader.fabriclike.models.FabricLikeLoader
 import com.movtery.zalithlauncher.game.addons.modloader.fabriclike.models.FabricLikeVersionsJson
 import com.movtery.zalithlauncher.path.GLOBAL_CLIENT
-import com.movtery.zalithlauncher.utils.isChinaMainland
 import com.movtery.zalithlauncher.utils.logging.Logger
 import com.movtery.zalithlauncher.utils.network.safeBodyAsJson
 import com.movtery.zalithlauncher.utils.network.withRetry
@@ -51,17 +50,13 @@ abstract class FabricLikeVersions(
         tag: String,
         mcVersion: String
     ): List<FabricLikeLoader>? = withContext(Dispatchers.Default) {
-        mirrorUrl?.takeIf { isChinaMainland() }?.let {
-            runMirrorable(
-                listOf(
-                    fetchListFromMirrorSource(SourceType.OFFICIAL, force, tag, mcVersion, officialUrl),
-                    fetchListFromMirrorSource(SourceType.BMCLAPI, force, tag, mcVersion, it)
-                ).orderedByGameSourcePreference()
-            )
-        } ?: run {
-            //不支持镜像源，只使用官方源
-            fetchListWithSource(force, tag, mcVersion, officialUrl)
-        }
+        //镜像始终作为候选：大陆网络下优先，其他网络下官方优先、镜像兜底
+        runMirrorable(
+            listOfNotNull(
+                fetchListFromMirrorSource(SourceType.OFFICIAL, force, tag, mcVersion, officialUrl),
+                mirrorUrl?.let { fetchListFromMirrorSource(SourceType.BMCLAPI, force, tag, mcVersion, it) }
+            ).orderedByGameSourcePreference()
+        )
     }
 
     private fun fetchListFromMirrorSource(

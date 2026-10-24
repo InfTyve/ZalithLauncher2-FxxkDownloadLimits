@@ -56,11 +56,13 @@ private val REPLACE_MIRROR_HOLDERS = mapOf(
 )
 
 /**
- * 替换为镜像源链接并按用户偏好排序；非中国大陆不注入任何镜像。
+ * 替换为镜像源链接并按用户偏好排序
+ *
+ * 镜像始终作为候选注入：大陆网络下镜像优先，其他网络下官方优先、镜像兜底。
+ * 不再用 isChinaMainland() 直接短路返回，否则时区判定一旦失准，
+ * 镜像就永远不会出现在候选列表里，多源换源机制形同虚设。
  */
 fun String.mapBMCLMirrorUrls(): List<String> {
-    if (!isChinaMainland()) return listOf(this)
-
     val mirrorUrl = REPLACE_MIRROR_HOLDERS.entries.firstOrNull { (origin, _) ->
         this.startsWith(origin)
     }?.let { (origin, mirror) ->
@@ -72,7 +74,7 @@ fun String.mapBMCLMirrorUrls(): List<String> {
         mirror = mirrorUrl,
         priority = resolveMirrorPriority(
             source = AllSettings.gameDownloadSource.getValue(),
-            mainland = true
+            mainland = isChinaMainland()
         )
     )
 }

@@ -34,14 +34,12 @@ private val REPLACE_MIRROR_HOLDERS = listOf(
 )
 
 private fun assetPlatformPriority(): MirrorPriority =
-    resolveMirrorPriority(AllSettings.assetPlatformSource.getValue(), mainland = true)
+    resolveMirrorPriority(AllSettings.assetPlatformSource.getValue(), mainland = isChinaMainland())
 
 /**
- * 按是否中国大陆决定是否启用 MCIM 镜像，并按偏好生成有序候选链接
+ * 生成有序候选链接：镜像始终作为候选注入，大陆网络下优先，其他网络下兜底
  */
 fun String.mapMCIMMirrorUrls(): List<String> {
-    if (!isChinaMainland()) return listOf(this)
-
     val mirroredUrl = REPLACE_MIRROR_HOLDERS.find { key ->
         startsWith(key)
     }?.let { origin ->
@@ -55,8 +53,6 @@ fun String.mapMCIMMirrorUrls(): List<String> {
  * 多链接形式：把数组内可被镜像替换的链接生成镜像版本，按偏好穿插到原列表前/后
  */
 fun Array<String>.mapMCIMMirrorUrls(): List<String> {
-    if (!isChinaMainland()) return toList()
-
     val sources = mapNotNull { url ->
         REPLACE_MIRROR_HOLDERS.find { key ->
             url.startsWith(key)
@@ -67,7 +63,8 @@ fun Array<String>.mapMCIMMirrorUrls(): List<String> {
     if (sources.isEmpty()) return toList()
 
     return when (assetPlatformPriority()) {
-        MirrorPriority.OFFICIAL -> this.toList()
-        MirrorPriority.MIRROR_FIRST -> sources + this.toList()
+        //官方优先时镜像不再被丢弃，而是追加到候选末尾兜底
+        MirrorPriority.OFFICIAL -> (this.toList() + sources).distinct()
+        MirrorPriority.MIRROR_FIRST -> (sources + this.toList()).distinct()
     }
 }

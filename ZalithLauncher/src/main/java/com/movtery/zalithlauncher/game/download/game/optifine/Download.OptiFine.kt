@@ -28,7 +28,6 @@ import com.movtery.zalithlauncher.game.addons.modloader.ModLoader
 import com.movtery.zalithlauncher.game.addons.modloader.optifine.OptiFineVersion
 import com.movtery.zalithlauncher.game.addons.modloader.optifine.OptiFineVersions
 import com.movtery.zalithlauncher.ui.androidText
-import com.movtery.zalithlauncher.utils.isChinaMainland
 import com.movtery.zalithlauncher.utils.network.downloadFile
 import com.movtery.zalithlauncher.utils.network.withSpeedReport
 import kotlinx.coroutines.Dispatchers
@@ -119,16 +118,13 @@ fun getOptiFineModsDownloadTask(
 private suspend fun getOFUrlMirrorable(
     optifine: OptiFineVersion
 ): String {
-    return if (isChinaMainland()) {
-        runMirrorable(
-            listOf(
-                fetchOfficialOptiFineUrlSource(optifine),
-                fetchBMCLOptiFineUrlSource(optifine)
-            ).orderedByGameSourcePreference()
-        )!!
-    } else {
-        fetchOptiFineDownloadUrl(optifine)
-    }
+    //官方链接在中国大陆基本不可达，镜像必须始终留在候选里作为兜底
+    return runMirrorable(
+        listOf(
+            fetchOfficialOptiFineUrlSource(optifine),
+            fetchBMCLOptiFineUrlSource(optifine)
+        ).orderedByGameSourcePreference()
+    )!!
 }
 
 /**

@@ -40,9 +40,15 @@ fun resolveMirrorPriority(source: MirrorSourceType, mainland: Boolean): MirrorPr
         else -> MirrorPriority.OFFICIAL
     }
 
-/** 按生效策略产出候选列表；官方档不注入镜像，镜像链接不存在时仅保留官方源 */
+/**
+ * 按生效策略产出候选列表
+ *
+ * 官方档不再直接丢弃镜像：官方源排在最前，镜像作为最后一层兜底。
+ * Mojang / Forge / CurseForge 的官方域名在中国大陆经常整体不可达，
+ * 如果候选里只剩官方链接，引擎的多源换源机制就无从发挥，用户只会看到「下载失败」。
+ */
 fun orderCandidates(official: String, mirror: String?, priority: MirrorPriority): List<String> =
     when (priority) {
-        MirrorPriority.OFFICIAL -> listOfNotNull(official)
+        MirrorPriority.OFFICIAL -> listOfNotNull(official, mirror)
         MirrorPriority.MIRROR_FIRST -> listOfNotNull(mirror, official)
-    }
+    }.distinct()

@@ -24,7 +24,6 @@ import com.movtery.zalithlauncher.game.addons.mirror.orderedByGameSourcePreferen
 import com.movtery.zalithlauncher.game.addons.mirror.runMirrorable
 import com.movtery.zalithlauncher.game.addons.modloader.ResponseTooShortException
 import com.movtery.zalithlauncher.path.GLOBAL_CLIENT
-import com.movtery.zalithlauncher.utils.isChinaMainland
 import com.movtery.zalithlauncher.utils.logging.Logger
 import com.movtery.zalithlauncher.utils.network.safeBodyAsJson
 import com.movtery.zalithlauncher.utils.network.safeBodyAsText
@@ -53,13 +52,10 @@ object OptiFineVersions {
         force: Boolean = false,
         gameVersion: String
     ): List<OptiFineVersion>? = withContext(Dispatchers.IO) {
-        if (isChinaMainland()) {
-            runMirrorable(
-                listOf(fetchOfficialSource(force), fetchBMCLAPISource(force)).orderedByGameSourcePreference()
-            )
-        } else {
-            fetchOfficialVersions(force)
-        }?.filter {
+        //镜像始终作为候选：大陆网络下优先，其他网络下官方优先、镜像兜底
+        runMirrorable(
+            listOf(fetchOfficialSource(force), fetchBMCLAPISource(force)).orderedByGameSourcePreference()
+        )?.filter {
             it.inherit == gameVersion
         }
     }

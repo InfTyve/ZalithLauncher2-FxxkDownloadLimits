@@ -25,7 +25,6 @@ import com.movtery.zalithlauncher.game.addons.mirror.runMirrorable
 import com.movtery.zalithlauncher.game.addons.modloader.ResponseTooShortException
 import com.movtery.zalithlauncher.path.GLOBAL_CLIENT
 import com.movtery.zalithlauncher.path.URL_USER_AGENT
-import com.movtery.zalithlauncher.utils.isChinaMainland
 import com.movtery.zalithlauncher.utils.logging.Logger
 import com.movtery.zalithlauncher.utils.network.safeBodyAsJson
 import com.movtery.zalithlauncher.utils.network.safeBodyAsText
@@ -54,13 +53,10 @@ object ForgeVersions {
      * 获取 Forge 版本列表
      */
     suspend fun fetchForgeList(mcVersion: String): List<ForgeVersion>? = withContext(Dispatchers.Default) {
-        if (isChinaMainland()) {
-            runMirrorable(
-                listOf(officialSource(mcVersion), bmclapiSource(mcVersion)).orderedByGameSourcePreference()
-            )
-        } else {
-            fetchListWithOfficial(mcVersion)
-        }?.sortedWith { o1, o2 ->
+        //镜像始终作为候选：大陆网络下优先，其他网络下官方优先、镜像兜底
+        runMirrorable(
+            listOf(officialSource(mcVersion), bmclapiSource(mcVersion)).orderedByGameSourcePreference()
+        )?.sortedWith { o1, o2 ->
             o2.forgeBuildVersion.compareTo(o1.forgeBuildVersion)
         }
     }

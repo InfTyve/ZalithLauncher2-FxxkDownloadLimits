@@ -19,6 +19,7 @@
 package com.movtery.zalithlauncher.game.addons.mirror
 
 import com.movtery.zalithlauncher.setting.AllSettings
+import com.movtery.zalithlauncher.utils.isChinaMainland
 import com.movtery.zalithlauncher.utils.logging.Logger
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.ensureActive
@@ -64,10 +65,11 @@ suspend fun <T> runMirrorable(
 
 /**
  * 把官方在前、镜像在后的规范源列表按“游戏内容下载源”设置重排；
- * 自动档下大陆用户镜像优先，官方档仅保留官方源
+ * 自动档下大陆用户镜像优先，官方档下官方优先但镜像仍保留为兜底。
  */
 fun <T> List<MirrorSource<T>>.orderedByGameSourcePreference(): List<MirrorSource<T>> =
-    when (resolveMirrorPriority(AllSettings.gameDownloadSource.getValue(), mainland = true)) {
-        MirrorPriority.OFFICIAL -> filter { it.type == SourceType.OFFICIAL }
+    when (resolveMirrorPriority(AllSettings.gameDownloadSource.getValue(), isChinaMainland())) {
+        //按类型稳定排序，而不是把镜像源过滤掉：官方源整体不可达时仍能落到镜像
+        MirrorPriority.OFFICIAL -> sortedBy { if (it.type == SourceType.OFFICIAL) 0 else 1 }
         MirrorPriority.MIRROR_FIRST -> reversed()
     }

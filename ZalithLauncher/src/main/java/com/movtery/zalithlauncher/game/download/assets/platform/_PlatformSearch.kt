@@ -107,32 +107,28 @@ suspend fun <E: AbstractPlatformSearcher, T> mirroredPlatformSearcher(
 }
 
 /**
- * 镜像源只能在中国地区使用
+ * 镜像源在列表中的优先级由设置决定，但永远保留在候选内
  */
 fun mirroredCurseForgeSource(
     enabledMirror: Boolean = isChinaMainland()
 ): List<CurseForgeSearcher> {
     val source = resolveMirrorPriority(AllSettings.assetPlatformSource.getValue(), mainland = enabledMirror)
-    val mirrorSource = mirrorCurseForgeSearcher.takeIf { enabledMirror }
     return when (source) {
-        MirrorPriority.OFFICIAL -> listOf(curseForgeSearcher)
-        MirrorPriority.MIRROR_FIRST ->
-            listOfNotNull(mirrorSource, curseForgeSearcher)
+        MirrorPriority.OFFICIAL -> listOf(curseForgeSearcher, mirrorCurseForgeSearcher)
+        MirrorPriority.MIRROR_FIRST -> listOf(mirrorCurseForgeSearcher, curseForgeSearcher)
     }
 }
 
 /**
- * 镜像源只能在中国地区使用
+ * 镜像源在列表中的优先级由设置决定，但永远保留在候选内
  */
 fun mirroredModrinthSource(
     enabledMirror: Boolean = isChinaMainland()
 ): List<ModrinthSearcher> {
     val source = resolveMirrorPriority(AllSettings.assetPlatformSource.getValue(), mainland = enabledMirror)
-    val mirrorSource = mirrorModrinthSearcher.takeIf { enabledMirror }
     return when (source) {
-        MirrorPriority.OFFICIAL -> listOf(modrinthSearcher)
-        MirrorPriority.MIRROR_FIRST ->
-            listOfNotNull(mirrorSource, modrinthSearcher)
+        MirrorPriority.OFFICIAL -> listOf(modrinthSearcher, mirrorModrinthSearcher)
+        MirrorPriority.MIRROR_FIRST -> listOf(mirrorModrinthSearcher, modrinthSearcher)
     }
 }
 
