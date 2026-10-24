@@ -83,7 +83,7 @@
     <string name="sort_by_last_modified">Sort by Last Modified</string>
     <string name="sort_by_last_played">Sort by Last Played</string>
     <!-- Launcher Version -->
-    <string name="launcher_version_debug_warning">You are using a test version of %s! This version may be unstable and is primarily intended for feature testing and early access. It is not recommended for long-term use! If you encounter any issues during testing, please report them to us via GitHub and we will address them as soon as possible.</string>
+    <string name="launcher_version_debug_warning">Warning: You are using the %s fixed from the download source! This version might not be stable, so if you care a lot, please use the official version.</string>
     <string name="launcher_version_debug_warning_cant_close">This warning cannot be dismissed</string>
     <!-- Themes -->
     <string name="theme_color_dynamic">Dynamic (Android 12+)</string>

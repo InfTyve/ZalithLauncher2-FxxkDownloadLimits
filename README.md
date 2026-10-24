@@ -1,4 +1,4 @@
-# Zalith Launcher 2
+# Zalith Launcher 2 下载源修复版本
 ![Downloads](https://img.shields.io/github/downloads/ZalithLauncher/ZalithLauncher2/total)
 [![Sponsor](https://img.shields.io/badge/sponsor-30363D?logo=GitHub-Sponsors)](https://afdian.com/a/MovTery)
 
@@ -6,6 +6,7 @@
 
 
 > [!IMPORTANT]
+> 此项目与 [ZalithLauncher2](https://github.com/ZalithLauncher/ZalithLauncher2) 属于分支关系
 > 该项目与 [ZalithLauncher](https://github.com/ZalithLauncher/ZalithLauncher) 属于两个完全不同的项目  
 
 **Zalith Launcher 2** 是一个全新设计、面向 **Android 设备** 的 [Minecraft: Java Edition](https://www.minecraft.net/) 启动器。项目使用 [PojavLauncher](https://github.com/PojavLauncherTeam/PojavLauncher/tree/v3_openjdk/app_pojavlauncher/src/main/jni) 作为启动核心，采用 **Jetpack Compose** 与 **Material Design 3** 构建现代化 UI 体验。  
@@ -13,6 +14,23 @@
 此外，我们已注意到有第三方使用“Zalith Launcher”名称搭建了一个看似官方的网站。请注意：**该网站并非我们创建**，其通过冒用名义并植入广告牟利。我们对此类行为**不参与、不认可、不信任**。  
 请务必提高警惕，**谨防个人隐私信息泄露**！
 
+## 注意：本项目使用AI辅助修改！
+## 二、逐文件改动
+
+| # | 文件 | 改动 | 效果 |
+|---|---|---|---|
+| 1 | `utils/LocalUtils.kt` | `isChinaMainland()` 兜底由 `false` 改为「UTC+8 即 true」，并补 `Asia/Hong_Kong`、`Asia/Macau`、`Asia/Taipei`、`Asia/Harbin`、`PRC` | 港澳台与被 ROM 改过时区名的设备不再被误判为境外 |
+| 2 | `utils/network/ResilientDns.kt` | 大陆网络下把 AliDNS 提到 DoH 列表首位 | 系统 DNS 被污染时不再白等 10 秒 |
+| 3 | `game/addons/mirror/BMCLAPI.kt` | 删除 `if (!isChinaMainland()) return listOf(this)`；`mainland` 参数改用真实判定 | 游戏本体/支持库/资源索引始终带镜像候选 |
+| 4 | `game/addons/mirror/_MirrorPreferences.kt` | `orderCandidates` 官方档由 `[official]` 改为 `[official, mirror]`，并 `distinct()` 去重 | 官方档也有兜底，且不会出现重复 URL |
+| 5 | `game/addons/mirror/_SourceUtils.kt` | `orderedByGameSourcePreference` 官方档由 `filter` 改为 `sortedBy`；`mainland` 改用真实判定 | 加载器版本列表不再只剩官方源 |
+| 6 | `game/download/assets/platform/mcim/MCIMMirror.kt` | 两处提前返回删除；数组版官方档改为「官方 + 镜像」；优先级改用真实判定 | CurseForge / Modrinth 下载链接始终带 MCIM 镜像 |
+| 7 | `game/download/assets/platform/_PlatformSearch.kt` | 两个 `mirrored*Source` 的官方档保留镜像搜索器 | 模组搜索在官方 API 失败后可落到镜像 API |
+| 8 | `modloader/fabriclike/FabricLikeVersions.kt` | 不再要求 `isChinaMainland()` 才走 `MirrorSource` 列表 | Fabric/Quilt 版本列表带镜像 |
+| 9 | `modloader/forgelike/forge/ForgeVersions.kt` | 同上 | Forge 版本列表带镜像 |
+| 10 | `modloader/forgelike/neoforge/NeoForgeVersions.kt` | 同上 | NeoForge 版本列表带镜像 |
+| 11 | `modloader/optifine/OptiFineVersions.kt` | 同上 | OptiFine 版本列表带镜像 |
+| 12 | `game/download/game/optifine/Download.OptiFine.kt` | `getOFUrlMirrorable` 不再按大陆与否二选一 | OptiFine 下载链接始终可换源 |
 
 ## 🌐 语言与翻译支持
 

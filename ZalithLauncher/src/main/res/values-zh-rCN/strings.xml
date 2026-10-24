@@ -83,7 +83,7 @@
     <string name="sort_by_last_modified">按修改时间排序</string>
     <string name="sort_by_last_played">按上次游玩时间排序</string>
     <!--  启动器版本  -->
-    <string name="launcher_version_debug_warning">您正在使用测试版的 %s！该版本可能并不稳定，主要是用于功能测试、尝鲜，不建议长期使用这个版本！如果您在测试过程中发现任何问题，请通过 Github 反馈给我们，我们会尽快处理。</string>
+    <string name="launcher_version_debug_warning">警告：您正在使用下载源修复的 %s！该版本可能并不稳定，如您非常在意请使用官方版本。</string>
     <string name="launcher_version_debug_warning_cant_close">这条警告无法被关闭</string>
     <!--  主题  -->
     <string name="theme_color_dynamic">动态 (Android 12+)</string>

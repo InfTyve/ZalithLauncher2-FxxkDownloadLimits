@@ -41,7 +41,7 @@
     <string name="generic_file_name">Имя файла: %s</string>
     <string name="generic_file_size">Размер файла: %s</string>
     <!-- Launcher Version -->
-    <string name="launcher_version_debug_warning">Вы используете тестовую версию %s! Эта версия может быть нестабильной и предназначена в первую очередь для тестирования функций и раннего доступа. Не рекомендуется для основного использования! Если вы столкнулись с проблемами во время тестирования, пожалуйста, сообщите о них через GitHub, и мы устраним их как можно скорее.</string>
+    <string name="launcher_version_debug_warning">Внимание: вы используете исправленную версию %s из источника загрузки! Эта версия может быть нестабильной, если вам это очень важно, используйте официальную версию.</string>
     <string name="launcher_version_debug_warning_cant_close">Это предупреждение нельзя закрыть</string>
     <!-- Themes -->
     <string name="theme_color_dynamic">Динамическая (Android 12+)</string>

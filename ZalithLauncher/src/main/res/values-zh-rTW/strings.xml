@@ -68,7 +68,7 @@
     <string name="date_format">yyyy \'年\' MM \'月\' dd \'日\' HH:mm:ss</string>
     <string name="duration_format">%s 天 %s 小時 %s 分鐘</string>
     <!--  啟動器版本  -->
-    <string name="launcher_version_debug_warning">您正在使用 %s 的測試版本！此版本可能不穩定，主要用於功能測試與搶先體驗，不建議長期使用！如果您在測試過程中發現任何問題，請透過 GitHub 回報給我們，我們會儘快處理。</string>
+    <string name="launcher_version_debug_warning">警告：您正在使用下載源修復的 %s！該版本可能並不穩定，如您非常在意請使用官方版本。</string>
     <string name="launcher_version_debug_warning_cant_close">此警告無法關閉</string>
     <!--  主題  -->
     <string name="theme_color_dynamic">動態 (Android 12+)</string>
